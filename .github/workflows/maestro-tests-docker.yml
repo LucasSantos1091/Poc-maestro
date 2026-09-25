@@ -61,12 +61,15 @@ jobs:
         run: docker exec android-emulator adb install -r /workspace/apk/app-debug.apk
 
       - name: Install Maestro CLI in container
-        run: docker exec android-emulator bash -c "curl -Ls 'https://get.maestro.mobile.dev' | bash"
+        run: docker exec -u root android-emulator bash -c "curl -Ls 'https://get.maestro.mobile.dev' | bash"
+
+      - name: Verify Maestro CLI install
+        run: docker exec -u root android-emulator bash -c "ls -la /root/.maestro/bin"
 
       - name: Run Maestro flows
         run: |
-          docker exec -w /workspace android-emulator bash -c \
-            'echo "HOME=$HOME"; export PATH="$PATH:$HOME/.maestro/bin" && maestro test .'
+          docker exec -u root -w /workspace android-emulator bash -c \
+            'export PATH="$PATH:/root/.maestro/bin" && maestro test .'
 
       - name: Container logs (debug)
         if: always()
