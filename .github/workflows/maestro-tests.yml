@@ -1,40 +1,45 @@
-name: Maestro Tests
+# Pipeline do BrowserStack App Automate — PAUSADA até a conta/secrets do
+# BrowserStack estarem configurados. Enquanto isso, o pipeline ativo é o
+# fallback com Docker (.github/workflows/maestro-tests-docker.yml).
+#
+# Para reativar: descomente tudo abaixo e cadastre os secrets
+# BROWSERSTACK_USERNAME e BROWSERSTACK_ACCESS_KEY no repositório.
 
-# Roda os fluxos .yaml do Maestro em dispositivos reais/emuladores do BrowserStack App Automate.
-# Dispara em push/PR para master e também pode ser rodado manualmente.
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-  workflow_dispatch:
-
-jobs:
-  maestro-tests:
-    name: Run Maestro flows on BrowserStack
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Check APK exists
-        run: |
-          if [ ! -f "apk/app-debug.apk" ]; then
-            echo "APK não encontrado em apk/app-debug.apk. Adicione o arquivo antes de rodar o pipeline." >&2
-            exit 1
-          fi
-
-      - name: Install BrowserStack Node SDK
-        run: npm install -g browserstack-node-sdk
-
-      - name: Run Maestro flows on BrowserStack
-        env:
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        run: browserstack-node-sdk maestro test .
+# name: Maestro Tests
+#
+# on:
+#   push:
+#     branches: [master]
+#   pull_request:
+#     branches: [master]
+#   workflow_dispatch:
+#
+# jobs:
+#   maestro-tests:
+#     name: Run Maestro flows on BrowserStack
+#     runs-on: ubuntu-latest
+#
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+#
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: "20"
+#
+#       - name: Check APK exists
+#         run: |
+#           if [ ! -f "apk/app-debug.apk" ]; then
+#             echo "APK não encontrado em apk/app-debug.apk. Adicione o arquivo antes de rodar o pipeline." >&2
+#             exit 1
+#           fi
+#
+#       - name: Install BrowserStack Node SDK
+#         run: npm install -g browserstack-node-sdk
+#
+#       - name: Run Maestro flows on BrowserStack
+#         env:
+#           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+#           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+#         run: browserstack-node-sdk maestro test .

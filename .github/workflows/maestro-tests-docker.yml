@@ -1,11 +1,14 @@
 name: Maestro Tests (Docker emulator - fallback)
 
-# Fallback temporário enquanto o BrowserStack não está configurado.
-# Roda um emulador Android dentro de um container Docker (budtmo/docker-android)
-# e executa os flows do Maestro contra ele.
-#
-# Disparo manual: aba Actions > Maestro Tests (Docker emulator - fallback) > Run workflow.
+# Pipeline ativa enquanto o BrowserStack não está configurado (ver
+# maestro-tests.yml, comentado). Roda um emulador Android dentro de um
+# container Docker (budtmo/docker-android) e executa os flows do Maestro
+# contra ele.
 on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
 
 jobs:
