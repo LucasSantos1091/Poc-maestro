@@ -1,0 +1,22 @@
+appId: com.example.cadastroapp
+
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Meus Cadastros"
+- tapOn:
+    text: "Usuários"
+    index: 1
+- assertVisible: "Usuários"
+- tapOn: "Novo usuário"
+- tapOn: "Nome"
+- inputText: "Lucas Farias"
+- tapOn: "E-mail"
+- inputText: "lucas@farias.com"
+- tapOn: "Telefone"
+- inputText: "11994488556"
+- tapOn: "Salvar"
+- assertVisible: "Lucas Farias"
+
+
+

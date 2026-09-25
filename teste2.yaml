@@ -1,0 +1,26 @@
+appId: com.example.cadastroapp
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Carros"
+- tapOn: "Carros"
+- assertVisible: "Carros"
+- tapOn: "Novo carro"
+- tapOn: "Marca"
+- inputText: "Volks"
+- tapOn: "Modelo"
+- inputText: "GOL"
+- tapOn: "Ano"
+- inputText: "1992"
+- tapOn: "Placa"
+- inputText: "HBG-8778"
+- tapOn: "Cor"
+- inputText: "azul"
+- tapOn: "Salvar"
+- assertVisible: "Volks"
+- assertVisible: "Excluir"
+- tapOn: "Voltar"
+
+
+
+
