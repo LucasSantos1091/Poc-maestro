@@ -66,7 +66,7 @@ jobs:
       - name: Run Maestro flows
         run: |
           docker exec -w /workspace android-emulator bash -c \
-            'export PATH="$PATH:/root/.maestro/bin" && maestro test .'
+            'echo "HOME=$HOME"; export PATH="$PATH:$HOME/.maestro/bin" && maestro test .'
 
       - name: Container logs (debug)
         if: always()
