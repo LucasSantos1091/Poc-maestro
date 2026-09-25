@@ -1,0 +1,17 @@
+# Configuração do BrowserStack App Automate para rodar os flows do Maestro.
+# Doc: https://www.browserstack.com/docs/app-automate/maestro
+
+userName: <BROWSERSTACK_USERNAME>
+accessKey: <BROWSERSTACK_ACCESS_KEY>
+
+app: ./apk/app-debug.apk
+
+platforms:
+  - platformName: android
+    deviceName: Google Pixel 7
+    platformVersion: 13.0
+  - platformName: android
+    deviceName: Samsung Galaxy S22
+    platformVersion: 12.0
+
+framework: maestro

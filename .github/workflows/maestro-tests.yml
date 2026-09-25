@@ -1,7 +1,7 @@
 name: Maestro Tests
 
-# Roda os fluxos .yaml do Maestro em um emulador Android.
-# Dispara em push/PR para main e também pode ser rodado manualmente.
+# Roda os fluxos .yaml do Maestro em dispositivos reais/emuladores do BrowserStack App Automate.
+# Dispara em push/PR para master e também pode ser rodado manualmente.
 on:
   push:
     branches: [master]
@@ -11,18 +11,17 @@ on:
 
 jobs:
   maestro-tests:
-    name: Run Maestro flows
-    runs-on: macos-latest # runner Apple Silicon (arm64) com aceleração de hardware nativa (HVF)
+    name: Run Maestro flows on BrowserStack
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          distribution: temurin
-          java-version: "17"
+          node-version: "20"
 
       - name: Check APK exists
         run: |
@@ -31,31 +30,11 @@ jobs:
             exit 1
           fi
 
-      - name: Install Maestro CLI
-        run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - name: Install BrowserStack Node SDK
+        run: npm install -g browserstack-node-sdk
 
-      - name: Run Android emulator and Maestro flows
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 33
-          target: google_apis
-          arch: arm64-v8a # macos-latest é Apple Silicon; x86_64 não tem aceleração de hardware e não boota
-          profile: pixel_5
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: |
-            adb install -r "apk/app-debug.apk"
-            "$HOME/.maestro/bin/maestro" test .
-
-      - name: Upload Maestro test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maestro-report
-          path: |
-            ~/.maestro/tests
-            **/*.xml
-          if-no-files-found: ignore
+      - name: Run Maestro flows on BrowserStack
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: browserstack-node-sdk maestro test .
