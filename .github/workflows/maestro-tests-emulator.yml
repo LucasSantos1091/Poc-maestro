@@ -1,0 +1,75 @@
+name: Maestro Tests (native emulator - fallback)
+
+# Pipeline ativa enquanto o BrowserStack não está configurado (ver
+# maestro-tests.yml, comentado). Roda um emulador Android nativo no runner
+# (via KVM, sem Docker) e executa os flows do Maestro contra ele.
+#
+# Tentamos antes rodar o emulador dentro de um container Docker
+# (budtmo/docker-android), mas a imagem tinha o usuário root quebrado no
+# /etc/passwd, impedindo instalar curl/maestro via apt. O caminho nativo
+# abaixo é o suportado oficialmente pela action reactivecircus/android-emulator-runner.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  maestro-tests:
+    name: Run Maestro flows (Android emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Check APK exists
+        run: |
+          if [ ! -f "apk/app-debug.apk" ]; then
+            echo "APK não encontrado em apk/app-debug.apk. Adicione o arquivo antes de rodar o pipeline." >&2
+            exit 1
+          fi
+
+      # Necessário para o runner Linux ter acesso ao /dev/kvm com aceleração de hardware.
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Run Android emulator and Maestro flows
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            adb install -r "apk/app-debug.apk"
+            maestro test .
+
+      - name: Upload Maestro test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report
+          path: |
+            ~/.maestro/tests
+            **/*.xml
+          if-no-files-found: ignore
