@@ -1,0 +1,20 @@
+appId: com.example.cadastroapp
+
+---
+- launchApp:
+    clearState: true
+- runScript: utils/fetch-usuario.js
+- assertVisible: "Meus Cadastros"
+- tapOn:
+    text: "Usuários"
+    index: 1
+- assertVisible: "Usuários"
+- tapOn: "Novo usuário"
+- tapOn: "Nome"
+- inputText: ${output.nome}
+- tapOn: "E-mail"
+- inputText: ${output.email}
+- tapOn: "Telefone"
+- inputText: ${output.telefone}
+- tapOn: "Salvar"
+- assertVisible: ${output.nome}
