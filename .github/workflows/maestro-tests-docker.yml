@@ -62,10 +62,13 @@ jobs:
 
       - name: Install Maestro CLI and run flows
         run: |
-          docker exec -w /workspace android-emulator bash -c '
+          docker exec -u 0 -w /workspace android-emulator bash -c '
             set -e
+            export HOME=/root
+            mkdir -p "$HOME"
             echo "whoami: $(whoami)"
             echo "HOME: $HOME"
+            command -v curl >/dev/null || (apt-get update -qq && apt-get install -y -qq curl ca-certificates unzip)
             curl -Ls "https://get.maestro.mobile.dev" | bash
             export PATH="$PATH:$HOME/.maestro/bin"
             which maestro
